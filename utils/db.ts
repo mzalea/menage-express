@@ -1,15 +1,26 @@
-import pg from 'pg'
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-const { Pool } = pg
 dotenv.config();
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432', 10),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
+const DEV_URI = "mongodb://localhost:27017/mydatabase"
 
-export default pool;
+const connectDB = async (): Promise<void> => {
+  try {
+    const uri = process.env.MONGODB_URI || DEV_URI;
+
+    await mongoose.connect(uri);
+
+    console.log('MongoDB Connected');
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error connecting to MongoDB:', error.message);
+      throw error;
+    } else {
+      console.error('An unknown error occurred:', error);
+      throw new Error('Unknown error occurred');
+    }
+  }
+};
+
+export default connectDB;
